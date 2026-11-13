@@ -36,3 +36,6 @@ wechatauto_db/
 *.db-wal
 *.db.24568.*
 *.db.11480.*
+
+# runtime OCR temp
+wechatauto_ocr_tmp.png
