@@ -28,3 +28,11 @@ test_sticker_send.py
 test_whitelist.py
 check_chance.py
 diag_*.py
+
+# WeChat runtime databases (never commit)
+wechatauto_db/
+*.db
+*.db-shm
+*.db-wal
+*.db.24568.*
+*.db.11480.*
