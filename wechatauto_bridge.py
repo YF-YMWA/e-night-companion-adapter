@@ -310,6 +310,8 @@ def pull_policy():
             VOICE_MODE = j["voiceMode"]
         if isinstance(j.get("voiceOutDevice"), (int, float)):
             VOICE_OUT_DEVICE = int(j["voiceOutDevice"])
+        elif isinstance(j.get("voiceOutDevice"), str) and j["voiceOutDevice"].strip():
+            VOICE_OUT_DEVICE = j["voiceOutDevice"]
     except Exception:                              # noqa: BLE001
         pass
 
@@ -467,7 +469,8 @@ try:
     if _vm_cfg in ("file", "ptt"):
         VOICE_MODE = _vm_cfg
     _vod = _w2.get("voiceOutDevice")
-    if isinstance(_vod, int):
+    # 允许两种写法：整数序号（会随插拔耳机变化），或设备名片段（推荐，如 "CABLE Input"）
+    if isinstance(_vod, int) or (isinstance(_vod, str) and _vod.strip()):
         VOICE_OUT_DEVICE = _vod
     # 有语音就不发文字 / 语音和图片不同时发
     VOICE_ONLY = bool(_w2.get("voiceOnly", False))
@@ -4754,7 +4757,7 @@ def main():
                                 _ctx,
                                 chat=target,
                                 tts_fn=core_tts,
-                                out_device=(VOICE_OUT_DEVICE if VOICE_OUT_DEVICE >= 0 else None),
+                                out_device=(VOICE_OUT_DEVICE if (isinstance(VOICE_OUT_DEVICE, str) or VOICE_OUT_DEVICE >= 0) else None),
                                 log=log,
                             )
                             if _res.get("ok"):

@@ -79,6 +79,32 @@ def list_inputs():
     return out
 
 
+
+def resolve_device(want=None):
+    """把「设备名片段或序号」解析成当前有效的序号。
+
+    为什么需要：winmm 的设备序号会随插拔耳机/增删设备重排，
+    写死 voiceOutDevice=0 在换设备后就指错了。
+    配置里写 "CABLE Input" 这种名字片段，每次按名字重新找。
+    """
+    outs = list_outputs()
+    if want is None:
+        return WAVE_MAPPER, "系统默认输出"
+    if isinstance(want, int) and want < 0:
+        return WAVE_MAPPER, "系统默认输出"
+    if isinstance(want, int):
+        for i, n in outs:
+            if i == want:
+                return i, n
+        return WAVE_MAPPER, "系统默认输出（序号 %s 不存在）" % want
+    key = str(want).strip().lower()
+    if not key:
+        return WAVE_MAPPER, "系统默认输出"
+    for i, n in outs:
+        if key in n.lower():
+            return i, n
+    return WAVE_MAPPER, "系统默认输出（没找到含 %r 的设备）" % want
+
 # ---------- WAV 播放（指定设备） ----------
 
 WAVE_FORMAT_PCM = 1

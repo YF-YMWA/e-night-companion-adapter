@@ -98,8 +98,11 @@ def send_voice(text, *, chat=None, tts_fn, ffmpeg="ffmpeg", out_device=None,
     except Exception as e:
         return {"ok": False, "error": "转码失败：%s" % e, "steps": steps}
 
+    # 设备序号会随插拔耳机重排 → 先按名字/序号解析成当前有效序号
+    _dev, _dev_name = V.resolve_device(out_device if out_device is not None else -1)
+
     try:
-        dur, dev_name = V.play_wav(pcm, out_device if out_device is not None else -1)
+        dur, dev_name = V.play_wav(pcm, _dev)
         steps.append("试播 %.1fs → %s" % (dur, dev_name))
     except Exception as e:
         return {"ok": False, "error": "播放失败：%s" % e, "steps": steps}
@@ -141,7 +144,7 @@ def send_voice(text, *, chat=None, tts_fn, ffmpeg="ffmpeg", out_device=None,
         t0 = time.time()
         steps.append("Alt 按下")
         time.sleep(0.6)   # 微信打开录音面板要点时间，太短前几个字进不去
-        V.play_wav(pcm, out_device if out_device is not None else -1)
+        V.play_wav(pcm, _dev)
         while time.time() - t0 < hold_s:
             time.sleep(0.02)
         V.alt_up()
